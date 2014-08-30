@@ -10,7 +10,7 @@ class Player(object):
 
 		self.pos_x = 0
 		self.pos_y = 0
-		self.speed = 10
+		self.speed = 5
 		self.width = 0
 		self.height = 0
 		self.walking = False
@@ -63,7 +63,7 @@ class Player(object):
 		if self.speed > 0:
 			if entered:
 				self.last_speed = self.speed
-				self.speed = 16
+				self.speed = 12
 			else:
 				self.speed = self.last_speed
 
@@ -120,7 +120,7 @@ class PhysicalPlayer(Player):
 
 	def __init__(self, camera, world):
 		super(PhysicalPlayer, self).__init__(camera, world)
-		self.MAX_FALL_SPEED = 16
+		self.MAX_FALL_SPEED = 8
 		self.fall_speed = 0
 		self.fall_state = self.STATE_GROUND
 
@@ -174,11 +174,15 @@ class PhysicalPlayer(Player):
 			isinstance(self.world.the_map[self.pos_x/GRID_SIZE][self.pos_y/GRID_SIZE], SolidBlock):
 				return True
 
-		if isinstance(self.world.the_map[self.pos_x/GRID_SIZE][self.pos_y/GRID_SIZE], SolidBlock) \
-			or isinstance(self.world.the_map[self.pos_x/GRID_SIZE][(self.pos_y+self.height-1)/GRID_SIZE], SolidBlock) \
-			or isinstance(self.world.the_map[(self.pos_x+self.width-1)/GRID_SIZE][self.pos_y/GRID_SIZE], SolidBlock) \
-			or isinstance(self.world.the_map[(self.pos_x+self.width-1)/GRID_SIZE][(self.pos_y+self.height-1)/GRID_SIZE], SolidBlock):
-				return True
+		for i in range(self.width):
+			if isinstance(self.world.the_map[(self.pos_x+i)/GRID_SIZE][self.pos_y/GRID_SIZE], SolidBlock) \
+				or isinstance(self.world.the_map[(self.pos_x+i)/GRID_SIZE][(self.pos_y+self.height-1)/GRID_SIZE], SolidBlock):
+					return True
+
+		for i in range(self.height):
+			if isinstance(self.world.the_map[self.pos_x/GRID_SIZE][(self.pos_y+i)/GRID_SIZE], SolidBlock) \
+				or isinstance(self.world.the_map[(self.pos_x+self.width-1)/GRID_SIZE][(self.pos_y+i)/GRID_SIZE], SolidBlock):
+					return True
 
 		return False
 
@@ -236,7 +240,7 @@ class PhysicalPlayer(Player):
 
 		if not self.is_on_surface():
 			if self.fall_speed < self.MAX_FALL_SPEED:
-				self.fall_speed += 4
+				self.fall_speed += 1
 			if self.fall_speed > self.MAX_FALL_SPEED:
 				self.fall_speed = self.MAX_FALL_SPEED
 
@@ -250,7 +254,7 @@ class PhysicalPlayer(Player):
 
 	def on_jump(self):
 		if self.is_on_surface():
-			self.fall_speed = -24
+			self.fall_speed = -12
 
 	def on_walk(self, right = True):
 		self.walking = True
@@ -302,10 +306,13 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 				block.strength -= 1
 
 		if self.placing:
-			if self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
-				[(self.curs_y-self.camera.offset_y)/GRID_SIZE] == None:
-					self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
-						[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = SolidBlock(name = 'dirtograss')
+			block = self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
+				[(self.curs_y-self.camera.offset_y)/GRID_SIZE]
+			if block == None:
+				self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
+					[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = SolidBlock(name = 'dirtograss')
+			elif isinstance(block, InteractiveBlock):
+				block.on_click()
 
 	def draw(self):
 		super(BuilderPlayer, self).draw()

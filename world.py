@@ -19,7 +19,7 @@ class World(object):
 				c.append(None)
 			self.the_map.append(c)
 
-	def gen_layer(self, block, height = 60, scale = 5):
+	def gen_layer(self, block_class = SolidBlock, block_args = ['stone'], height = 60, scale = 5):
 		cur_scale = scale/2
 		h = height
 		if height < scale:
@@ -34,7 +34,7 @@ class World(object):
 			for c in self.the_map:
 				for y in range(len(c)-(h-cur_scale), len(c)):
 					while c[y] == None:
-						c[y] = block
+						c[y] = block_class(*block_args)
 				step_tick += 1
 				if step_tick >= step_len:
 					step_tick = 0
@@ -57,9 +57,9 @@ class World(object):
 	def generate(self, w = 240, h = 180):
 		self.the_map = []
 		self.initialize_map(w, h)
-		self.gen_layer(SolidBlock('adminium', material = 'dirt'), height = 7, scale = 3)
-		self.gen_layer(SolidBlock('stone', material = 'stone'))
-		self.gen_layer(SolidBlock('dirtograss'), height = 65)
+		self.gen_layer(SolidBlock, ['adminium', 100500], height = 7, scale = 3)
+		self.gen_layer(SolidBlock, ['stone', 38])
+		self.gen_layer(SolidBlock, ['dirtograss'], height = 65)
 
 	def draw(self):
 		range_x = [self.camera.offset_x/-GRID_SIZE, 1+self.camera.offset_x/-GRID_SIZE+self.camera.screen_w/GRID_SIZE]

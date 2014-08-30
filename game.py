@@ -27,6 +27,8 @@ class TrollGame:
 		self.pc = CreeperPlayerController(self.player)
 		self.player.spawn()
 
+		self.clock = pygame.time.Clock()
+
 	def loop(self):
 		events = pygame.event.get()
 		self.pc.dispatch_events(events)
@@ -61,3 +63,4 @@ class TrollGame:
 		while True:
 			self.loop()
 			self.draw()
+			self.clock.tick(60)

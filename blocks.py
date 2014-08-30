@@ -9,13 +9,14 @@ class Block(object):
 	def on_destroyed(self):
 		pass
 
-class SolidBlock(Block):
-	def __init__(self, strength = 16, material = 'pootis'):
-		super(SolidBlock, self).__init__()
-		self.strength = strength
-		self.material = material
+class InteractiveBlock(Block):
+	def on_click(self):
+		pass
 
-	def __init__(self, name, strength = 16, material = 'pootis'):
+class SolidBlock(Block):
+	def __init__(self, name, strength = 16):
 		super(SolidBlock, self).__init__(name)
 		self.strength = strength
-		self.material = material
+
+class LiquidBlock(Block):
+	pass

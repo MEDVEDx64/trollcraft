@@ -11,7 +11,7 @@ class Background():
 		self.camera = camera
 		self.color = [150, 200, 220, 255]
 		self.day = False
-		self.skip = 250
+		self.skip = 2000
 
 	def tick(self):
 		if self.skip > 0:
@@ -20,11 +20,11 @@ class Background():
 
 		if self.day and self.color[3] > 252:
 			self.day = False
-			self.skip = 2000
+			self.skip = 4000
 			return
 		elif not self.day and self.color[3] < 4:
 			self.day = True
-			self.skip = 1600
+			self.skip = 2600
 			return
 
 		if self.day:
