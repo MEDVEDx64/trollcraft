@@ -42,7 +42,7 @@ class Background():
 			elif self.color[i] > 255:
 				self.color[i] = 255
 
-		self.skip = 10
+		self.skip = 48
 
 	def draw_stars(self):
 		random.seed(100500)

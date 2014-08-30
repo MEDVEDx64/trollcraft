@@ -1,6 +1,5 @@
 from random import randint
 from blocks import *
-import image
 
 GRID_SIZE = 32
 
@@ -9,7 +8,6 @@ class World(object):
 		self.the_map = []
 		self.images = image_db
 		self.camera = camera
-		image.populate_image_db(self.images, 'grafon/blocks/')
 		self.generate()
 
 	def initialize_map(self, w, h):

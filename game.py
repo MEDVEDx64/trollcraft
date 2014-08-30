@@ -7,6 +7,8 @@ from image import *
 from world import *
 from layers import *
 
+image_repo = None
+
 class TrollGame:
 	SCREEN_W = 800
 	SCREEN_H = 512
@@ -18,8 +20,13 @@ class TrollGame:
 		pygame.display.set_caption('TROLLCRAFT 2D')
 
 		self.cam = Camera(self.SCREEN_W, self.SCREEN_H)
-		self.idb = ImageDB(self.cam)
-		self.world = World(self.cam, self.idb)
+		global image_repo
+		image_repo = ImageDB(self.cam)
+		populate_image_db(image_repo, 'grafon/')
+		populate_image_db(image_repo, 'grafon/etc/')
+		self.blocks = ImageDB(self.cam)
+		populate_image_db(self.blocks, 'grafon/blocks/')
+		self.world = World(self.cam, self.blocks)
 		self.bg = Background(self.world, self.cam)
 
 		# Player
