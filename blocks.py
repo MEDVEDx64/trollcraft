@@ -1,3 +1,6 @@
+import game
+import gui
+
 class Block(object):
 	# Basic block class
 	def __init__(self):
@@ -20,3 +23,7 @@ class SolidBlock(Block):
 
 class LiquidBlock(Block):
 	pass
+
+class TestBlock(InteractiveBlock, SolidBlock):
+	def on_click(self):
+		game.dialog.show(gui.Frame)

@@ -216,6 +216,7 @@ class PhysicalPlayer(Player):
 				if direction == 'down':
 					self.pos_y -= 1
 					if self.in_collision():
+						self.fall_speed = 0
 						self.pos_y += 1
 						break
 				elif direction == 'up':
@@ -277,6 +278,7 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 		self.curs_y = 0
 		self.digging = False
 		self.placing = False
+		self.highlighted_block = None
 
 	def on_digging_start(self):
 		self.digging = True
@@ -285,36 +287,35 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 		self.digging = False
 
 	def on_placing_start(self):
-		self.placing = True
+		if isinstance(self.highlighted_block, InteractiveBlock):
+			self.highlighted_block.on_click()
+		else:
+			self.placing = True
 
 	def on_placing_end(self):
 		self.placing = False
 
 	def loop(self):
 		super(BuilderPlayer, self).loop()
-		if self.digging:
-			try:
-				block = self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
-					[(self.curs_y-self.camera.offset_y)/GRID_SIZE]
-			except IndexError:
+		try:
+			self.highlighted_block = self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
+				[(self.curs_y-self.camera.offset_y)/GRID_SIZE]
+		except IndexError:
 				return
 
-			if isinstance(block, SolidBlock):
-				if block.strength == 0:
-					block.on_destroyed()
+		if self.digging:
+			if isinstance(self.highlighted_block, SolidBlock):
+				if self.highlighted_block.strength == 0:
+					self.highlighted_block.on_destroyed()
 					self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
 						[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = None
 					return
-				block.strength -= 1
+				self.highlighted_block.strength -= 1
 
 		if self.placing:
-			block = self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
-				[(self.curs_y-self.camera.offset_y)/GRID_SIZE]
-			if block == None:
+			if self.highlighted_block == None:
 				self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
-					[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = SolidBlock(name = 'dirtograss')
-			elif isinstance(block, InteractiveBlock):
-				block.on_click()
+					[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = TestBlock(name = 'adminium')
 
 	def draw(self):
 		super(BuilderPlayer, self).draw()

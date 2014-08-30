@@ -6,8 +6,8 @@ from pygame.locals import *
 from image import *
 from world import *
 from layers import *
-
-image_repo = None
+from gui import *
+from glob import glob
 
 class TrollGame:
 	SCREEN_W = 800
@@ -36,14 +36,23 @@ class TrollGame:
 
 		self.clock = pygame.time.Clock()
 
+		pygame.font.init()
+		font = pygame.font.Font(glob('ttf/*.ttf')[0], 16)
+		global dialog
+		dialog = DialogManager(font, self.cam)
+
 	def loop(self):
 		events = pygame.event.get()
-		self.pc.dispatch_events(events)
-		self.bg.tick()
 		for ev in events:
 			if ev.type == QUIT:
 				self.shutdown()
+
+		if dialog.frame.active:
+			dialog.frame.dispatch_events(events)
+		else:
+			self.pc.dispatch_events(events)
 				
+		self.bg.tick()
 		self.player.loop()
 
 	def cls(self):
@@ -59,10 +68,14 @@ class TrollGame:
 		self.world.draw()
 		if isinstance(self.player, DrawablePlayer):
 			self.player.draw()
+
+		if dialog.frame.active:
+			dialog.frame.draw()
 		pygame.display.flip()
 
 	def shutdown(self):
 		self.bg.running = False
+		pygame.font.quit()
 		sys.exit(0)
 
 	def __init__(self):
