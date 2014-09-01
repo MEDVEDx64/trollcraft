@@ -280,6 +280,9 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 		self.placing = False
 		self.highlighted_block = None
 
+		self.block_class = SolidBlock
+		self.block_args = ['stone']
+
 	def on_digging_start(self):
 		self.digging = True
 
@@ -288,7 +291,7 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 
 	def on_placing_start(self):
 		if isinstance(self.highlighted_block, InteractiveBlock):
-			self.highlighted_block.on_click()
+			self.highlighted_block.on_click(self, self.world)
 		else:
 			self.placing = True
 
@@ -315,7 +318,7 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 		if self.placing:
 			if self.highlighted_block == None:
 				self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
-					[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = TestBlock(name = 'adminium')
+					[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = self.block_class(*self.block_args)
 
 	def draw(self):
 		super(BuilderPlayer, self).draw()

@@ -24,6 +24,11 @@ class SolidBlock(Block):
 class LiquidBlock(Block):
 	pass
 
-class TestBlock(InteractiveBlock, SolidBlock):
-	def on_click(self):
-		game.dialog.show(gui.Frame)
+class DictionaryBlock(Block):
+	def __init__(self, name):
+		super(DictionaryBlock, self).__init__(name)
+		self.dict = {}
+
+class InventoryBlock(InteractiveBlock, SolidBlock, DictionaryBlock):
+	def on_click(self, player = None, world = None):
+		game.dialog.show(gui.InventoryFrame, [player, world, self.dict])

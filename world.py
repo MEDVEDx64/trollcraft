@@ -1,5 +1,6 @@
 from random import randint
-from blocks import *
+import blocks
+import copy
 
 GRID_SIZE = 32
 
@@ -17,7 +18,7 @@ class World(object):
 				c.append(None)
 			self.the_map.append(c)
 
-	def gen_layer(self, block_class = SolidBlock, block_args = ['stone'], height = 60, scale = 5):
+	def gen_layer(self, block, height = 60, scale = 5):
 		cur_scale = scale/2
 		h = height
 		if height < scale:
@@ -32,7 +33,7 @@ class World(object):
 			for c in self.the_map:
 				for y in range(len(c)-(h-cur_scale), len(c)):
 					while c[y] == None:
-						c[y] = block_class(*block_args)
+						c[y] = copy.copy(block)
 				step_tick += 1
 				if step_tick >= step_len:
 					step_tick = 0
@@ -49,15 +50,21 @@ class World(object):
 							cur_scale += 3
 
 		except IndexError:
-			print("""Lololo! Shi*t happened! The world the_map is uninitialized,
+			print("""Oops, zat was not medicine! The world the_map is uninitialized,
 				or there were very much invalid input values.""")
 
 	def generate(self, w = 240, h = 180):
 		self.the_map = []
 		self.initialize_map(w, h)
-		self.gen_layer(SolidBlock, ['adminium', 100500], height = 7, scale = 3)
-		self.gen_layer(SolidBlock, ['stone', 38])
-		self.gen_layer(SolidBlock, ['dirtograss'], height = 65)
+		self.gen_layer(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3)
+		self.gen_layer(blocks.SolidBlock('stone', 38))
+		self.gen_layer(blocks.SolidBlock('dirtograss'), height = 65)
+
+		# test
+		b = blocks.InventoryBlock('adminium')
+		b.dict = {'blocks': [blocks.SolidBlock('dirtograss'), \
+			blocks.SolidBlock('adminium'), blocks.LiquidBlock('water')]}
+		self.gen_layer(b, height = 67)
 
 	def draw(self):
 		range_x = [self.camera.offset_x/-GRID_SIZE, 1+self.camera.offset_x/-GRID_SIZE+self.camera.screen_w/GRID_SIZE]
@@ -73,7 +80,7 @@ class World(object):
 
 		for x in range(*range_x):
 			for y in range(*range_y):
-				if isinstance(self.the_map[x][y], Block):
+				if isinstance(self.the_map[x][y], blocks.Block):
 					self.images.draw_image(self.the_map[x][y].name, x*GRID_SIZE, y*GRID_SIZE)
 
 	def get_width(self):

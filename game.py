@@ -4,7 +4,7 @@ import sys
 from player import *
 from pygame.locals import *
 from image import *
-from world import *
+from world import World
 from layers import *
 from gui import *
 from glob import glob
