@@ -60,12 +60,6 @@ class World(object):
 		self.gen_layer(blocks.SolidBlock('stone', 38))
 		self.gen_layer(blocks.SolidBlock('dirtograss'), height = 65)
 
-		# test
-		b = blocks.InventoryBlock('adminium')
-		b.dict = {'blocks': [blocks.SolidBlock('dirtograss'), \
-			blocks.SolidBlock('adminium'), blocks.LiquidBlock('water')]}
-		self.gen_layer(b, height = 67)
-
 	def draw(self):
 		range_x = [self.camera.offset_x/-GRID_SIZE, 1+self.camera.offset_x/-GRID_SIZE+self.camera.screen_w/GRID_SIZE]
 		range_y = [self.camera.offset_y/-GRID_SIZE, 1+self.camera.offset_y/-GRID_SIZE+self.camera.screen_h/GRID_SIZE]
@@ -88,3 +82,13 @@ class World(object):
 
 	def get_height(self):
 		return len(self.the_map[0])
+
+	def drop_a_block(self, block, x = -1):
+		fx = x
+		if x < 0:
+			fx = randint(0, self.get_width()-1)
+
+		for y in range(self.get_height()):
+			if not y == 0 and isinstance(self.the_map[fx][y], blocks.SolidBlock):
+				self.the_map[fx][y] = block
+				break

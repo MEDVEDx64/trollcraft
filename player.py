@@ -1,7 +1,6 @@
 import game
-
-from image import *
-from blocks import *
+import image
+import blocks
 from random import randint
 
 class Player(object):
@@ -33,7 +32,7 @@ class Player(object):
 			attempts -= 1
 			r = randint(0, self.world.get_width())
 			for i in range(self.world.get_height()):
-				if isinstance(self.world.the_map[r][i], SolidBlock):
+				if isinstance(self.world.the_map[r][i], blocks.SolidBlock):
 					if i == 0:
 						continue
 
@@ -76,10 +75,10 @@ class DrawablePlayer(Player):
 class AnimatedPlayer(DrawablePlayer):
 	def __init__(self, camera, world):
 		super(AnimatedPlayer, self).__init__(camera, world)
-		self.frames = ImageDB(self.camera)
+		self.frames = image.ImageDB(self.camera)
 
 	def initialize_animation(self, sprites_path = 'grafon/player/pootis/'):
-		populate_image_db(self.frames, sprites_path)
+		image.populate_image_db(self.frames, sprites_path)
 		self.current = 0
 		self.length = len(self.frames.images)/2+1
 		if self.length == 0 or not '0' in self.frames.images:
@@ -173,17 +172,17 @@ class PhysicalPlayer(Player):
 				return True
 
 		if (self.width == 0 or self.height == 0) and \
-			isinstance(self.world.the_map[self.pos_x/GRID_SIZE][self.pos_y/GRID_SIZE], SolidBlock):
+			isinstance(self.world.the_map[self.pos_x/GRID_SIZE][self.pos_y/GRID_SIZE], blocks.SolidBlock):
 				return True
 
 		for i in range(self.width):
-			if isinstance(self.world.the_map[(self.pos_x+i)/GRID_SIZE][self.pos_y/GRID_SIZE], SolidBlock) \
-				or isinstance(self.world.the_map[(self.pos_x+i)/GRID_SIZE][(self.pos_y+self.height-1)/GRID_SIZE], SolidBlock):
+			if isinstance(self.world.the_map[(self.pos_x+i)/GRID_SIZE][self.pos_y/GRID_SIZE], blocks.SolidBlock) \
+				or isinstance(self.world.the_map[(self.pos_x+i)/GRID_SIZE][(self.pos_y+self.height-1)/GRID_SIZE], blocks.SolidBlock):
 					return True
 
 		for i in range(self.height):
-			if isinstance(self.world.the_map[self.pos_x/GRID_SIZE][(self.pos_y+i)/GRID_SIZE], SolidBlock) \
-				or isinstance(self.world.the_map[(self.pos_x+self.width-1)/GRID_SIZE][(self.pos_y+i)/GRID_SIZE], SolidBlock):
+			if isinstance(self.world.the_map[self.pos_x/GRID_SIZE][(self.pos_y+i)/GRID_SIZE], blocks.SolidBlock) \
+				or isinstance(self.world.the_map[(self.pos_x+self.width-1)/GRID_SIZE][(self.pos_y+i)/GRID_SIZE], blocks.SolidBlock):
 					return True
 
 		return False
@@ -280,7 +279,7 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 		self.placing = False
 		self.highlighted_block = None
 
-		self.block_class = SolidBlock
+		self.block_class = blocks.SolidBlock
 		self.block_args = ['stone']
 
 	def on_digging_start(self):
@@ -290,7 +289,7 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 		self.digging = False
 
 	def on_placing_start(self):
-		if isinstance(self.highlighted_block, InteractiveBlock):
+		if isinstance(self.highlighted_block, blocks.InteractiveBlock):
 			self.highlighted_block.on_click(self, self.world)
 		else:
 			self.placing = True
@@ -307,7 +306,7 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 				return
 
 		if self.digging:
-			if isinstance(self.highlighted_block, SolidBlock):
+			if isinstance(self.highlighted_block, blocks.SolidBlock):
 				if self.highlighted_block.strength == 0:
 					self.highlighted_block.on_destroyed()
 					self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \

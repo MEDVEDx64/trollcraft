@@ -1,13 +1,15 @@
 import pygame
 import sys
 
-from player import *
-from pygame.locals import *
-from image import *
-from world import World
-from layers import *
-from gui import *
+import player
+import image
+import layers
+import blocks
+import world
+import gui
+
 from glob import glob
+from pygame.locals import *
 
 class TrollGame:
 	SCREEN_W = 800
@@ -19,19 +21,19 @@ class TrollGame:
 		self.window = pygame.display.set_mode((self.SCREEN_W, self.SCREEN_H))
 		pygame.display.set_caption('TROLLCRAFT 2D')
 
-		self.cam = Camera(self.SCREEN_W, self.SCREEN_H)
+		self.cam = image.Camera(self.SCREEN_W, self.SCREEN_H)
 		global image_repo
-		image_repo = ImageDB(self.cam)
-		populate_image_db(image_repo, 'grafon/')
-		populate_image_db(image_repo, 'grafon/etc/')
-		self.blocks = ImageDB(self.cam)
-		populate_image_db(self.blocks, 'grafon/blocks/')
-		self.world = World(self.cam, self.blocks)
-		self.bg = Background(self.world, self.cam)
+		image_repo = image.ImageDB(self.cam)
+		image.populate_image_db(image_repo, 'grafon/')
+		image.populate_image_db(image_repo, 'grafon/etc/')
+		self.blocks = image.ImageDB(self.cam)
+		image.populate_image_db(self.blocks, 'grafon/blocks/')
+		self.world = world.World(self.cam, self.blocks)
+		self.bg = layers.Background(self.world, self.cam)
 
 		# Player
-		self.player = CreeperPlayer(self.cam, self.world)
-		self.pc = CreeperPlayerController(self.player)
+		self.player = player.CreeperPlayer(self.cam, self.world)
+		self.pc = player.CreeperPlayerController(self.player)
 		self.player.spawn()
 
 		self.clock = pygame.time.Clock()
@@ -39,7 +41,16 @@ class TrollGame:
 		pygame.font.init()
 		font = pygame.font.Font(glob('ttf/*.ttf')[0], 16)
 		global dialog
-		dialog = DialogManager(font, self.cam)
+		dialog = gui.DialogManager(font, self.cam)
+
+		crate = blocks.InventoryBlock('adminium', strength = 250)
+		crate.dict = {
+			'blocks': [
+				blocks.SolidBlock('dirtograss'),
+				blocks.SolidBlock('stone', strength = 38)
+			]
+		}
+		self.world.drop_a_block(crate)
 
 	def loop(self):
 		events = pygame.event.get()
@@ -66,7 +77,7 @@ class TrollGame:
 		self.cls()
 		self.bg.draw()
 		self.world.draw()
-		if isinstance(self.player, DrawablePlayer):
+		if isinstance(self.player, player.DrawablePlayer):
 			self.player.draw()
 
 		if dialog.frame.active:
