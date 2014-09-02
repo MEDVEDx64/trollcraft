@@ -13,6 +13,15 @@ class Element(object):
 	def draw(self):
 		pass
 
+class FPSElement(Element):
+	def draw(self):
+		try:
+			s = self.font.render('FPS: ' + str(round(self.args[0].get_fps(), 2)), True, \
+				(255, 255, 255, 255), (0, 0, 0, 255))
+			pygame.display.get_surface().blit(s, (4, self.camera.screen_h - 5 - s.get_height()))
+		except IndexError:
+			pass
+
 class Frame(Element):
 	def __init__(self, font, camera, args = None):
 		super(Frame, self).__init__(font, camera, args)

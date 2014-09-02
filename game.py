@@ -47,10 +47,19 @@ class TrollGame:
 		crate.dict = {
 			'blocks': [
 				blocks.SolidBlock('dirtograss'),
-				blocks.SolidBlock('stone', strength = 38)
+				blocks.SolidBlock('stone', strength = 38),
+				blocks.SolidBlock('dirt'),
+				blocks.SolidBlock('bricks'),
+				blocks.SolidBlock('graybricks')
 			]
 		}
 		self.world.drop_a_block(crate)
+
+		self.gui_elements = []
+		self.gui_elements.append(gui.FPSElement(font, self.cam, [self.clock]))
+
+		self.final_fx = layers.FXStack()
+		#self.final_fx.add_layer(layers.PixelateFX())
 
 	def loop(self):
 		events = pygame.event.get()
@@ -80,8 +89,15 @@ class TrollGame:
 		if isinstance(self.player, player.DrawablePlayer):
 			self.player.draw()
 
+		for element in self.gui_elements:
+			element.draw()
+
 		if dialog.frame.active:
 			dialog.frame.draw()
+
+		# Applying FX stack
+		# screen = pygame.display.get_surface()
+		# screen.blit(self.final_fx.process(screen), (0, 0))
 		pygame.display.flip()
 
 	def shutdown(self):

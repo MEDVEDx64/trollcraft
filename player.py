@@ -11,7 +11,7 @@ class Player(object):
 
 		self.pos_x = 0
 		self.pos_y = 0
-		self.speed = 5
+		self.speed = 16
 		self.width = 0
 		self.height = 0
 		self.walking = False
@@ -122,6 +122,7 @@ class PhysicalPlayer(Player):
 	def __init__(self, camera, world):
 		super(PhysicalPlayer, self).__init__(camera, world)
 		self.MAX_FALL_SPEED = 8
+		self.speed = 5
 		self.fall_speed = 0
 		self.fall_state = self.STATE_GROUND
 

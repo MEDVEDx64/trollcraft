@@ -58,6 +58,7 @@ class World(object):
 		self.initialize_map(w, h)
 		self.gen_layer(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3)
 		self.gen_layer(blocks.SolidBlock('stone', 38))
+		self.gen_layer(blocks.SolidBlock('dirt'), scale = 7)
 		self.gen_layer(blocks.SolidBlock('dirtograss'), height = 65)
 
 	def draw(self):
@@ -90,5 +91,5 @@ class World(object):
 
 		for y in range(self.get_height()):
 			if not y == 0 and isinstance(self.the_map[fx][y], blocks.SolidBlock):
-				self.the_map[fx][y] = block
+				self.the_map[fx][y-1] = block
 				break

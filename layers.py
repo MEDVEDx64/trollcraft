@@ -75,3 +75,25 @@ class Background():
 	def draw(self):
 		self.draw_stars()
 		self.draw_sky()
+
+class FXLayer(object):
+	def process(self, surface):
+		return surface
+
+class PixelateFX(FXLayer):
+	def process(self, surface):
+		s = pygame.transform.scale(surface, (surface.get_width()/2, surface.get_height()/2))
+		return pygame.transform.scale(s, (surface.get_width(), surface.get_height()))
+
+class FXStack:
+	def __init__(self):
+		self.stack = []
+
+	def add_layer(self, layer):
+		self.stack.append(layer)
+
+	def process(self, surface):
+		cs = surface
+		for layer in self.stack:
+			cs = layer.process(cs)
+		return cs
