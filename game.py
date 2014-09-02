@@ -50,7 +50,8 @@ class TrollGame:
 				blocks.SolidBlock('stone', strength = 38),
 				blocks.SolidBlock('dirt'),
 				blocks.SolidBlock('bricks'),
-				blocks.SolidBlock('graybricks')
+				blocks.SolidBlock('graybricks'),
+				blocks.SolidBlock('red_kernel')
 			]
 		}
 		self.world.drop_a_block(crate)
