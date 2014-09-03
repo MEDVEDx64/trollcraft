@@ -18,7 +18,7 @@ class World(object):
 				c.append(None)
 			self.the_map.append(c)
 
-	def gen_layer(self, block, height = 60, scale = 5):
+	def gen_layer(self, block, height = 60, scale = 5, force = False):
 		cur_scale = scale/2
 		h = height
 		if height < scale:
@@ -32,7 +32,7 @@ class World(object):
 		try:
 			for c in self.the_map:
 				for y in range(len(c)-(h-cur_scale), len(c)):
-					while c[y] == None:
+					if c[y] == None or force:
 						c[y] = copy.copy(block)
 				step_tick += 1
 				if step_tick >= step_len:
@@ -53,13 +53,51 @@ class World(object):
 			print("""Oops, zat was not medicine! The world the_map is uninitialized,
 				or there were very much invalid input values.""")
 
+	def gen_pile(self, block, x, y):
+		for ix in range(4):
+			for iy in range(4):
+				ok = True
+				if ix == 0 or iy == 0 or ix == 3 or iy == 3:
+					if randint(0, 6) > 2:
+						ok = False
+				if ok:
+					try:
+						self.the_map[ix+x][iy+y] = copy.copy(block)
+					except IndexError:
+						pass
+
+	def gen_ores(self, block, height = 54, chance = 10):
+		for x in range(0, self.get_width(), 8):
+			for y in range(self.get_height()-height, self.get_height(), 6):
+				if randint(0, 100) > (100-chance):
+					rn = randint(0, 10)
+					rx = x+randint(0, 6)
+					ry = y+randint(0, 5)
+
+					try:
+						if rn > 6:
+							self.gen_pile(block, rx, ry)
+						elif rn > 3:
+							self.the_map[rx][ry] = copy.copy(block)
+							if randint(0, 4) > 2: self.the_map[rx+1][ry] = copy.copy(block)
+							if randint(0, 4) > 2: self.the_map[rx+1][ry+1] = copy.copy(block)
+							self.the_map[rx][ry+1] = copy.copy(block)
+						else:
+							self.the_map[rx][ry] = copy.copy(block)
+					except IndexError:
+						pass
+
 	def generate(self, w = 240, h = 180):
 		self.the_map = []
 		self.initialize_map(w, h)
-		self.gen_layer(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3)
 		self.gen_layer(blocks.SolidBlock('stone', 38))
 		self.gen_layer(blocks.SolidBlock('dirt'), scale = 7)
 		self.gen_layer(blocks.SolidBlock('dirtograss'), height = 65)
+
+		self.gen_ores(blocks.SolidBlock('dirt'), chance = 25)
+		self.gen_ores(blocks.SolidBlock('bricks'), height = 28)
+
+		self.gen_layer(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3, force = True)
 
 	def draw(self):
 		range_x = [self.camera.offset_x/-GRID_SIZE, 1+self.camera.offset_x/-GRID_SIZE+self.camera.screen_w/GRID_SIZE]
