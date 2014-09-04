@@ -11,7 +11,10 @@ class Background():
 		self.camera = camera
 		self.color = [150, 200, 220, 255]
 		self.day = False
-		self.skip = 2000
+		self.skip = random.randint(0, 2000)
+		if random.randint(0, 10) > 4:
+			self.day = True
+			self.color[3] = 0
 
 	def tick(self):
 		if self.skip > 0:
