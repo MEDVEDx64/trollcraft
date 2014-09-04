@@ -188,12 +188,15 @@ class PhysicalPlayer(Player):
 
 		return False
 
+	def in_liquid(self):
+		return isinstance(self.world.the_map[(self.pos_x+self.width/2)/GRID_SIZE] \
+			[(self.pos_y+self.height/2)/GRID_SIZE], blocks.LiquidBlock)
+
 	def move(self, direction, speed):
 		# Handling liquids
 		nspeed = speed
-		if isinstance(self.world.the_map[(self.pos_x+self.width/2)/GRID_SIZE] \
-			[(self.pos_y+self.height/2)/GRID_SIZE], blocks.LiquidBlock) and not nspeed == 0:
-				nspeed = nspeed/2
+		if self.in_liquid() and not nspeed == 0:
+			nspeed = nspeed/2
 
 		if nspeed > 0:
 			for i in range(nspeed):

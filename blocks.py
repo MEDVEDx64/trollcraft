@@ -27,22 +27,27 @@ class LiquidBlock(Block):
 	def __init__(self, name = 'water'):
 		super(LiquidBlock, self).__init__(name)
 		self.liquid_factor = 0
+		self.LIQUID_FACTOR_MAX = 16
 
 	def tick(self, x, y, world):
-		if self.liquid_factor < 16:
+		if self.liquid_factor < self.LIQUID_FACTOR_MAX:
 			self.liquid_factor += 1
 			return
 
 		nblock = copy.copy(world.the_map[x][y])
 		nblock.liquid_factor = 0
 
-		if world.the_map[x][y+1] == None:
-			world.the_map[x][y+1] = nblock
+		try:
+			if world.the_map[x][y+1] == None:
+				world.the_map[x][y+1] = nblock
 
-		if world.the_map[x-1][y] == None or world.the_map[x+1][y] == None:
+			if world.the_map[x-1][y] == None or world.the_map[x+1][y] == None:
+				world.the_map[x][y] = None
+			else:
+				world.the_map[x][y] = nblock
+
+		except IndexError:
 			world.the_map[x][y] = None
-		else:
-			world.the_map[x][y] = nblock
 
 class DictionaryBlock(Block):
 	def __init__(self, name):
