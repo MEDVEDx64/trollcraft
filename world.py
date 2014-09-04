@@ -99,7 +99,7 @@ class World(object):
 
 		self.gen_layer(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3, force = True)
 
-	def draw(self):
+	def draw(self): # it also invokes tick method on blocks
 		range_x = [self.camera.offset_x/-GRID_SIZE, 1+self.camera.offset_x/-GRID_SIZE+self.camera.screen_w/GRID_SIZE]
 		range_y = [self.camera.offset_y/-GRID_SIZE, 1+self.camera.offset_y/-GRID_SIZE+self.camera.screen_h/GRID_SIZE]
 		if self.camera.offset_x >= 0:
@@ -114,6 +114,8 @@ class World(object):
 		for x in range(*range_x):
 			for y in range(*range_y):
 				if isinstance(self.the_map[x][y], blocks.Block):
+					self.the_map[x][y].tick(x, y, self)
+				if isinstance(self.the_map[x][y], blocks.Block):
 					self.images.draw_image(self.the_map[x][y].name, x*GRID_SIZE, y*GRID_SIZE)
 
 	def get_width(self):
@@ -127,7 +129,10 @@ class World(object):
 		if x < 0:
 			fx = randint(0, self.get_width()-1)
 
-		for y in range(self.get_height()):
-			if not y == 0 and isinstance(self.the_map[fx][y], blocks.SolidBlock):
-				self.the_map[fx][y-1] = block
-				break
+		try:
+			for y in range(self.get_height()):
+				if not y == 0 and isinstance(self.the_map[fx][y], blocks.SolidBlock):
+					self.the_map[fx][y-1] = block
+					break
+		except IndexError:
+			print('Cannot drop a block outside the world.')

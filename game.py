@@ -45,16 +45,9 @@ class TrollGame:
 
 		crate = blocks.InventoryBlock('adminium', strength = 250)
 		crate.dict = {
-			'blocks': [
-				blocks.SolidBlock('dirtograss'),
-				blocks.SolidBlock('stone', strength = 38),
-				blocks.SolidBlock('dirt'),
-				blocks.SolidBlock('bricks'),
-				blocks.SolidBlock('graybricks'),
-				blocks.SolidBlock('red_kernel')
-			]
+			'blocks': blocks.known_blocks
 		}
-		self.world.drop_a_block(crate)
+		self.world.drop_a_block(crate, self.player.pos_x/world.GRID_SIZE+2)
 
 		self.gui_elements = []
 		self.gui_elements.append(gui.FPSElement(font, self.cam, [self.clock]))

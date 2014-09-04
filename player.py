@@ -189,8 +189,14 @@ class PhysicalPlayer(Player):
 		return False
 
 	def move(self, direction, speed):
-		if speed > 0:
-			for i in range(speed):
+		# Handling liquids
+		nspeed = speed
+		if isinstance(self.world.the_map[(self.pos_x+self.width/2)/GRID_SIZE] \
+			[(self.pos_y+self.height/2)/GRID_SIZE], blocks.LiquidBlock) and not nspeed == 0:
+				nspeed = nspeed/2
+
+		if nspeed > 0:
+			for i in range(nspeed):
 				if direction == 'up':
 					self.pos_y -= 1
 					if self.in_collision():
@@ -212,7 +218,7 @@ class PhysicalPlayer(Player):
 						self.pos_x += 1
 						break
 		elif speed < 0:
-			for i in range(speed*-1):
+			for i in range(nspeed*-1):
 				if direction == 'down':
 					self.pos_y -= 1
 					if self.in_collision():
@@ -315,8 +321,14 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 					return
 				self.highlighted_block.strength -= 1
 
+			elif isinstance(self.highlighted_block, blocks.Block):
+				self.highlighted_block.on_destroyed()
+				self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
+					[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = None
+				return
+
 		if self.placing:
-			if self.highlighted_block == None:
+			if not isinstance(self.highlighted_block, blocks.SolidBlock):
 				self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
 					[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = self.block_class(*self.block_args)
 
