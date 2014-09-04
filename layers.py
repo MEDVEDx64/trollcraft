@@ -1,20 +1,18 @@
 # Some drawable stuff
 
 import time
+import world
 import pygame
 import pygame.gfxdraw
 import random
 
-class Background():
+class Background:
 	def __init__(self, world, camera):
 		self.world = world
 		self.camera = camera
 		self.color = [150, 200, 220, 255]
 		self.day = False
 		self.skip = random.randint(0, 2000)
-		if random.randint(0, 10) > 4:
-			self.day = True
-			self.color[3] = 0
 
 	def tick(self):
 		if self.skip > 0:
@@ -54,10 +52,15 @@ class Background():
 			x = random.randint(0, self.camera.screen_w)
 			y = random.randint(0, self.camera.screen_h)
 			size = random.randint(0, 1)
+
+			alpha = (self.world.get_height()*world.GRID_SIZE+self.camera.offset_y-768)/4
+			if alpha > 255: alpha = 255
+			elif alpha < 0: alpha = 0
+
 			if size == 0:
-				pygame.gfxdraw.pixel(screen, x, y, (255, 255, 255, 255))
+				pygame.gfxdraw.pixel(screen, x, y, (255, 255, 255, alpha))
 			else:
-				pygame.gfxdraw.box(screen, (x, y, 2, 2), (255, 255, 255, 255))
+				pygame.gfxdraw.box(screen, (x, y, 2, 2), (255, 255, 255, alpha))
 
 	def draw_sky(self):
 		screen = pygame.display.get_surface()
@@ -78,6 +81,21 @@ class Background():
 	def draw(self):
 		self.draw_stars()
 		self.draw_sky()
+
+class Foreground:
+	def __init__(self, world, camera):
+		self.world = world
+		self.camera = camera
+
+	def draw(self):
+		fading_step = 16
+		the_initial = self.world.get_height()*world.GRID_SIZE-fading_step*112
+		if self.camera.offset_y < -(the_initial):
+			screen = pygame.display.get_surface()
+			try:
+				pygame.gfxdraw.box(screen, (0, 0, self.camera.screen_w, self.camera.screen_h), (0, 0, 0, -((the_initial+self.camera.offset_y)/fading_step)*2))
+			except TypeError:
+				pass
 
 class FXLayer(object):
 	def process(self, surface):

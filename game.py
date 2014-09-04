@@ -30,6 +30,7 @@ class TrollGame:
 		image.populate_image_db(self.blocks, 'grafon/blocks/')
 		self.world = world.World(self.cam, self.blocks)
 		self.bg = layers.Background(self.world, self.cam)
+		self.fg = layers.Foreground(self.world, self.cam)
 
 		# Player
 		self.player = player.CreeperPlayer(self.cam, self.world)
@@ -82,6 +83,8 @@ class TrollGame:
 		self.world.draw()
 		if isinstance(self.player, player.DrawablePlayer):
 			self.player.draw()
+
+		self.fg.draw()
 
 		for element in self.gui_elements:
 			element.draw()

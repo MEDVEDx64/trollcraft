@@ -38,13 +38,13 @@ class LiquidBlock(Block):
 		nblock.liquid_factor = 0
 
 		try:
-			if world.the_map[x][y+1] == None:
-				world.the_map[x][y+1] = nblock
-
 			if world.the_map[x-1][y] == None or world.the_map[x+1][y] == None:
 				world.the_map[x][y] = None
 			else:
 				world.the_map[x][y] = nblock
+			
+			if world.the_map[x][y+1] == None:
+				world.the_map[x][y+1] = nblock
 
 		except IndexError:
 			world.the_map[x][y] = None
