@@ -43,6 +43,8 @@ class TrollGame:
 		font = pygame.font.Font(glob('ttf/*.ttf')[0], 16)
 		global dialog
 		dialog = gui.DialogManager(font, self.cam)
+		global cursor
+		cursor = gui.CursorElement(font, self.cam)
 
 		crate = blocks.InventoryBlock('adminium', strength = 250)
 		crate.dict = {
@@ -52,6 +54,7 @@ class TrollGame:
 
 		self.gui_elements = []
 		self.gui_elements.append(gui.FPSElement(font, self.cam, [self.clock]))
+		self.gui_elements.append(cursor)
 
 		self.final_fx = layers.FXStack()
 		#self.final_fx.add_layer(layers.PixelateFX())
@@ -80,10 +83,10 @@ class TrollGame:
 	def draw(self):
 		self.cls()
 		self.bg.draw()
-		self.world.draw()
 		if isinstance(self.player, player.DrawablePlayer):
 			self.player.draw()
 
+		self.world.draw()
 		self.fg.draw()
 
 		for element in self.gui_elements:

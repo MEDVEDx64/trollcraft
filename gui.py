@@ -3,6 +3,7 @@ from world import GRID_SIZE
 import pygame
 import blocks
 import image
+import game
 
 class Element(object):
 	def __init__(self, font, camera, args = None):
@@ -21,6 +22,22 @@ class FPSElement(Element):
 			pygame.display.get_surface().blit(s, (4, self.camera.screen_h - 5 - s.get_height()))
 		except IndexError:
 			pass
+
+class CursorElement(Element):
+	def __init__(self, font, camera, args = None):
+		super(CursorElement, self).__init__(font, camera, args)
+		self.rect = (0, 0, 0, 0)
+		self.digging = False
+
+	def update(self, rect, digging = False):
+		self.rect = rect
+		self.digging = digging
+
+	def draw(self):
+		s = pygame.display.get_surface()
+		pygame.gfxdraw.box(s, self.rect, (0xff, 0, 0, 0x60))
+		if self.digging:
+			game.image_repo.draw_image('pickaxe', self.rect[0]+1, self.rect[1]+1, True)
 
 class Frame(Element):
 	def __init__(self, font, camera, args = None):

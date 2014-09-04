@@ -340,9 +340,7 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 		s = pygame.display.get_surface()
 		x = (self.curs_x-self.camera.offset_x)/GRID_SIZE*GRID_SIZE+self.camera.offset_x
 		y = (self.curs_y-self.camera.offset_y)/GRID_SIZE*GRID_SIZE+self.camera.offset_y
-		pygame.gfxdraw.box(s, (x, y, GRID_SIZE, GRID_SIZE), (0xff, 0, 0, 0x60))
-		if self.digging:
-			game.image_repo.draw_image('pickaxe', x+1, y+1, True)
+		game.cursor.update((x, y, GRID_SIZE, GRID_SIZE), self.digging)
 
 class CreeperPlayer(BuilderPlayer):
 	def __init__(self, camera, world):
