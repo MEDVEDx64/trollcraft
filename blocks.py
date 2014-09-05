@@ -63,8 +63,10 @@ known_blocks = [
 	SolidBlock('dirtograss'),
 	SolidBlock('stone', strength = 38),
 	SolidBlock('dirt'),
-	SolidBlock('bricks', strength = 40),
-	SolidBlock('graybricks', strength = 40),
-	SolidBlock('red_graphonium', strength = 64),
-	LiquidBlock('water')
+	LiquidBlock('water'),
+	SolidBlock('bricks_gray', strength = 40),
+	SolidBlock('bricks_blue', strength = 40),
+	SolidBlock('bricks_yellow', strength = 40),
+	SolidBlock('bricks_red', strength = 40),
+	SolidBlock('grafonium_red', strength = 120)
 ]

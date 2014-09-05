@@ -95,7 +95,8 @@ class World(object):
 		self.gen_layer(blocks.SolidBlock('dirtograss'), height = 65)
 
 		self.gen_ores(blocks.SolidBlock('dirt'), chance = 25)
-		self.gen_ores(blocks.SolidBlock('bricks'), height = 28)
+		self.gen_ores(blocks.SolidBlock('grafonium_crystal_type_a', strength = 100), height = 32)
+		self.gen_ores(blocks.SolidBlock('grafonium_crystal_type_b', strength = 100), height = 22, chance = 5)
 
 		self.gen_layer(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3, force = True)
 

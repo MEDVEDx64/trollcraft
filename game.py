@@ -46,7 +46,7 @@ class TrollGame:
 		global cursor
 		cursor = gui.CursorElement(font, self.cam)
 
-		crate = blocks.InventoryBlock('adminium', strength = 250)
+		crate = blocks.InventoryBlock('inventory_white', strength = 250)
 		crate.dict = {
 			'blocks': blocks.known_blocks
 		}
