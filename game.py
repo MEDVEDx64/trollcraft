@@ -55,6 +55,7 @@ class TrollGame:
 		self.gui_elements = []
 		self.gui_elements.append(gui.FPSElement(font, self.cam, [self.clock]))
 		self.gui_elements.append(cursor)
+		self.gui_elements.append(gui.SlotsElement(font, self.cam, [self.player, self.world]))
 
 		self.final_fx = layers.FXStack()
 		#self.final_fx.add_layer(layers.PixelateFX())

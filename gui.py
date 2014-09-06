@@ -4,6 +4,7 @@ import pygame
 import blocks
 import image
 import game
+import copy
 
 class Element(object):
 	def __init__(self, font, camera, args = None):
@@ -22,6 +23,25 @@ class FPSElement(Element):
 			pygame.display.get_surface().blit(s, (4, self.camera.screen_h - 5 - s.get_height()))
 		except IndexError:
 			pass
+
+class SlotsElement(Element):
+	def draw(self):
+		display = pygame.display.get_surface()
+		start_x, start_y = 4, 4
+		pygame.gfxdraw.rectangle(display, (start_x-1, start_y-1, \
+			len(self.args[0].slots)*20+2, 22), (0, 0, 0, 255))
+
+		for i in range(len(self.args[0].slots)):
+			red = 32
+			if i%2 == 0:
+				red = 96
+
+			pygame.gfxdraw.box(display, (start_x+i*20, start_y, 20, 20), (red, 64, 224, 160))
+			if self.args[0].highlighted_slot == i:
+				pygame.gfxdraw.rectangle(display, (start_x+i*20, start_y, 20, 20), (255, 255, 0, 255))
+			if isinstance(self.args[0].slots[i], blocks.Block):
+				s = pygame.transform.scale(self.args[1].images.images[self.args[0].slots[i].name], (16, 16))
+				display.blit(s, (start_x+i*(20)+2, start_y+2))
 
 class CursorElement(Element):
 	def __init__(self, font, camera, args = None):
@@ -113,10 +133,9 @@ class InventoryFrame(Frame):
 			if e.type == MOUSEBUTTONDOWN and e.button == 1:
 				try:
 					b = self.items[str(self.curs_x) + '.' + str(self.curs_y)]
-					self.args[0].block_class = type(b)
-					self.args[0].block_args = [b.name]
+					self.args[0].slots[self.args[0].highlighted_slot] = copy.copy(b)
 					self.active = False
-				except KeyError:
+				except (KeyError, TypeError):
 					pass
 
 class DialogManager:

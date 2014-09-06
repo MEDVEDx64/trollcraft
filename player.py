@@ -1,6 +1,7 @@
 import game
 import image
 import blocks
+import copy
 from random import randint
 
 class Player(object):
@@ -289,8 +290,8 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 		self.placing = False
 		self.highlighted_block = None
 
-		self.block_class = blocks.SolidBlock
-		self.block_args = ['stone']
+		self.slots = [None, None, None, None, None]
+		self.highlighted_slot = 0
 
 	def on_digging_start(self):
 		self.digging = True
@@ -306,6 +307,10 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 
 	def on_placing_end(self):
 		self.placing = False
+
+	def on_slot_change(self, nslot):
+		if nslot >= 0 and nslot < len(self.slots):
+			self.highlighted_slot = nslot
 
 	def loop(self):
 		super(BuilderPlayer, self).loop()
@@ -332,8 +337,11 @@ class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
 
 		if self.placing:
 			if not isinstance(self.highlighted_block, blocks.SolidBlock):
-				self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
-					[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = self.block_class(*self.block_args)
+				try:
+					self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
+						[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = copy.copy(self.slots[self.highlighted_slot])
+				except TypeError:
+					pass
 
 	def draw(self):
 		super(BuilderPlayer, self).draw()
@@ -373,6 +381,12 @@ class BuilderPlayerController(PlayerController):
 	def dispatch_events(self, events):
 		super(BuilderPlayerController, self).dispatch_events(events)
 		for e in events:
+			if self.km.get_key_state(K_1) == KS_PRESSED: self.player.on_slot_change(0)
+			if self.km.get_key_state(K_2) == KS_PRESSED: self.player.on_slot_change(1)
+			if self.km.get_key_state(K_3) == KS_PRESSED: self.player.on_slot_change(2)
+			if self.km.get_key_state(K_4) == KS_PRESSED: self.player.on_slot_change(3)
+			if self.km.get_key_state(K_5) == KS_PRESSED: self.player.on_slot_change(4)
+
 			if e.type == MOUSEMOTION or e.type == MOUSEBUTTONDOWN or e.type == MOUSEBUTTONUP:
 				self.player.curs_x = e.pos[0]
 				self.player.curs_y = e.pos[1]
