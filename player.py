@@ -33,7 +33,7 @@ class Player(object):
 			attempts -= 1
 			r = randint(0, self.world.get_width())
 			for i in range(self.world.get_height()):
-				if isinstance(self.world.the_map[r][i], blocks.SolidBlock):
+				if not i == 0 and (isinstance(self.world.the_map[r][i], blocks.SolidBlock) or i == self.world.get_height()-1):
 					if i == 0:
 						continue
 

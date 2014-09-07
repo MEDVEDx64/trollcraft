@@ -6,18 +6,55 @@ GRID_SIZE = 32
 
 class World(object):
 	def __init__(self, camera, image_db):
-		self.the_map = []
 		self.images = image_db
 		self.camera = camera
-		self.generate()
+		self.initialize_map()
 
-	def initialize_map(self, w, h):
+	def initialize_map(self, w = 240, h = 180):
+		self.the_map = []
 		for i in range(w):
 			c = []
 			for i in range(h):
 				c.append(None)
 			self.the_map.append(c)
 
+	def tick(self):
+		pass
+
+	def draw(self): # it also invokes tick method on blocks
+		range_x = [self.camera.offset_x/-GRID_SIZE, 1+self.camera.offset_x/-GRID_SIZE+self.camera.screen_w/GRID_SIZE]
+		range_y = [self.camera.offset_y/-GRID_SIZE, 1+self.camera.offset_y/-GRID_SIZE+self.camera.screen_h/GRID_SIZE]
+		if self.camera.offset_x >= 0:
+			range_x[0] = 0
+		if self.camera.offset_y >= 0:
+			range_y[0] = 0
+		if range_x[1] > self.get_width():
+			range_x[1] = self.get_width()
+		if range_y[1] > self.get_height():
+			range_y[1] = self.get_height()
+
+		for x in range(*range_x):
+			for y in range(*range_y):
+				if isinstance(self.the_map[x][y], blocks.Block):
+					self.the_map[x][y].tick(x, y, self)
+				if isinstance(self.the_map[x][y], blocks.Block):
+					self.images.draw_image(self.the_map[x][y].name, x*GRID_SIZE, y*GRID_SIZE)
+
+	def get_width(self):
+		return len(self.the_map)
+
+	def get_height(self):
+		return len(self.the_map[0])
+
+class ThemedWorld(World):
+	def initialize_map(self, w = 240, h = 180):
+		super(ThemedWorld, self).initialize_map(w, h)
+		self.generate(w, h)
+
+	def generate(self, w, h):
+		pass
+
+class ClassicThemedWorld(ThemedWorld):
 	def gen_layer(self, block, height = 60, scale = 5, force = False):
 		cur_scale = scale/2
 		h = height
@@ -88,8 +125,8 @@ class World(object):
 						pass
 
 	def generate(self, w = 240, h = 180):
-		self.the_map = []
-		self.initialize_map(w, h)
+		super(ClassicThemedWorld, self).generate(w, h)
+
 		self.gen_layer(blocks.SolidBlock('stone', 38))
 		self.gen_layer(blocks.SolidBlock('dirt'), scale = 7)
 		self.gen_layer(blocks.SolidBlock('dirtograss'), height = 65)
@@ -99,31 +136,6 @@ class World(object):
 		self.gen_ores(blocks.SolidBlock('grafonium_crystal_type_b', strength = 100), height = 22, chance = 5)
 
 		self.gen_layer(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3, force = True)
-
-	def draw(self): # it also invokes tick method on blocks
-		range_x = [self.camera.offset_x/-GRID_SIZE, 1+self.camera.offset_x/-GRID_SIZE+self.camera.screen_w/GRID_SIZE]
-		range_y = [self.camera.offset_y/-GRID_SIZE, 1+self.camera.offset_y/-GRID_SIZE+self.camera.screen_h/GRID_SIZE]
-		if self.camera.offset_x >= 0:
-			range_x[0] = 0
-		if self.camera.offset_y >= 0:
-			range_y[0] = 0
-		if range_x[1] > self.get_width():
-			range_x[1] = self.get_width()
-		if range_y[1] > self.get_height():
-			range_y[1] = self.get_height()
-
-		for x in range(*range_x):
-			for y in range(*range_y):
-				if isinstance(self.the_map[x][y], blocks.Block):
-					self.the_map[x][y].tick(x, y, self)
-				if isinstance(self.the_map[x][y], blocks.Block):
-					self.images.draw_image(self.the_map[x][y].name, x*GRID_SIZE, y*GRID_SIZE)
-
-	def get_width(self):
-		return len(self.the_map)
-
-	def get_height(self):
-		return len(self.the_map[0])
 
 	def drop_a_block(self, block, x = -1):
 		fx = x
