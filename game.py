@@ -29,8 +29,6 @@ class TrollGame:
 		self.blocks = image.ImageDB(self.cam)
 		image.populate_image_db(self.blocks, 'grafon/blocks/')
 		self.world = world.ClassicThemedWorld(self.cam, self.blocks)
-		self.bg = layers.Background(self.world, self.cam)
-		self.fg = layers.Foreground(self.world, self.cam)
 
 		# Player
 		self.player = player.CreeperPlayer(self.cam, self.world)
@@ -71,7 +69,7 @@ class TrollGame:
 		else:
 			self.pc.dispatch_events(events)
 				
-		self.bg.tick()
+		self.world.tick()
 		self.player.loop()
 
 	def cls(self):
@@ -83,12 +81,12 @@ class TrollGame:
 
 	def draw(self):
 		self.cls()
-		self.bg.draw()
+		self.world.bg.draw()
 		if isinstance(self.player, player.DrawablePlayer):
 			self.player.draw()
 
 		self.world.draw()
-		self.fg.draw()
+		self.world.fg.draw()
 
 		for element in self.gui_elements:
 			element.draw()
@@ -102,7 +100,6 @@ class TrollGame:
 		pygame.display.flip()
 
 	def shutdown(self):
-		self.bg.running = False
 		pygame.font.quit()
 		sys.exit(0)
 

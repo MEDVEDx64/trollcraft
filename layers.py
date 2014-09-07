@@ -6,10 +6,30 @@ import pygame
 import pygame.gfxdraw
 import random
 
-class Background:
+class Layer(object):
 	def __init__(self, world, camera):
 		self.world = world
 		self.camera = camera
+
+	def tick(self): pass
+	def draw(self): pass
+
+class ComplexLayer(Layer):
+	def __init__(self, world, camera):
+		super(ComplexLayer, self).__init__(world, camera)
+		self.layers = []
+
+	def tick(self):
+		for l in self.layers:
+			l.tick()
+
+	def draw(self):
+		for l in self.layers:
+			l.draw()
+
+class ClassicBackground(Layer):
+	def __init__(self, world, camera):
+		super(ClassicBackground, self).__init__(world, camera)
 		self.color = [150, 200, 220, 255]
 		self.day = False
 		self.skip = random.randint(0, 2000)
@@ -82,11 +102,7 @@ class Background:
 		self.draw_stars()
 		self.draw_sky()
 
-class Foreground:
-	def __init__(self, world, camera):
-		self.world = world
-		self.camera = camera
-
+class ClassicForeground(Layer):
 	def draw(self):
 		fading_step = 16
 		the_initial = self.world.get_height()*world.GRID_SIZE-fading_step*112

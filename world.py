@@ -1,5 +1,6 @@
 from random import randint
 import blocks
+import layers
 import copy
 
 GRID_SIZE = 32
@@ -9,6 +10,7 @@ class World(object):
 		self.images = image_db
 		self.camera = camera
 		self.initialize_map()
+		self.create_layers()
 
 	def initialize_map(self, w = 240, h = 180):
 		self.the_map = []
@@ -18,8 +20,13 @@ class World(object):
 				c.append(None)
 			self.the_map.append(c)
 
+	def create_layers(self):
+		self.bg = layers.Layer(self, self.camera)
+		self.fg = layers.Layer(self, self.camera)
+
 	def tick(self):
-		pass
+		self.bg.tick()
+		self.fg.tick()
 
 	def draw(self): # it also invokes tick method on blocks
 		range_x = [self.camera.offset_x/-GRID_SIZE, 1+self.camera.offset_x/-GRID_SIZE+self.camera.screen_w/GRID_SIZE]
@@ -55,6 +62,12 @@ class ThemedWorld(World):
 		pass
 
 class ClassicThemedWorld(ThemedWorld):
+	def create_layers(self):
+		self.bg = layers.ComplexLayer(self, self.camera)
+		self.bg.layers.append(layers.ClassicBackground(self, self.camera))
+		self.fg = layers.ComplexLayer(self, self.camera)
+		self.fg.layers.append(layers.ClassicForeground(self, self.camera))
+
 	def gen_layer(self, block, height = 60, scale = 5, force = False):
 		cur_scale = scale/2
 		h = height
