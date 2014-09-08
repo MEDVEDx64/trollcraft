@@ -1,6 +1,7 @@
 from pygame.locals import *
 from world import GRID_SIZE
 import pygame
+import player
 import blocks
 import image
 import game
@@ -26,6 +27,9 @@ class FPSElement(Element):
 
 class SlotsElement(Element):
 	def draw(self):
+		if len(self.args) < 1 or not isinstance(self.args[0], player.BuilderPlayer):
+			return
+
 		display = pygame.display.get_surface()
 		start_x, start_y = 5, 5
 		pygame.gfxdraw.rectangle(display, (start_x-1, start_y-1, \

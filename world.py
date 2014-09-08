@@ -71,7 +71,7 @@ class ClassicThemedWorld(ThemedWorld):
 		self.fg = layers.ComplexLayer(self, self.camera)
 		self.fg.layers.append(layers.ClassicForeground(self, self.camera))
 
-	def gen_layer(self, block, height = 60, scale = 5, force = False):
+	def gen_ground(self, block, height = 60, scale = 5, force = False):
 		cur_scale = scale/2
 		h = height
 		if height < scale:
@@ -140,15 +140,58 @@ class ClassicThemedWorld(ThemedWorld):
 					except IndexError:
 						pass
 
-	def drop_a_block(self, block, x = -1):
+	def create_vertical(self, block, x, y_start, y_end):
+		for y in range(y_start, y_end):
+			self.the_map[x][y] = copy.copy(block)
+
+	def gen_mountain(self, x = -1, root_height = 54, size = 12):
+		rh = self.get_height()-root_height
+
+		rx = x
+		if rx < 0:
+			rx = randint(0, self.get_width()-1)
+
+		i = 0
+		cy = rh-1
+		peak = False
+		try:
+			while(cy < rh):
+				if not peak and i > size+randint(-8, 8):
+					peak = True
+					if randint(0, 5) > 2:
+						for z in range(randint(2, 20)):
+							if randint(0, 4) > 2:
+								cy += 1
+							else:
+								cy -= 1
+
+							for zz in range(randint(2, 3)):
+								self.create_vertical(blocks.SolidBlock('stone', strength = 38), rx, cy, rh)
+								rx += 1
+
+				r = randint(1, 3)
+				if peak:
+					cy += r
+				else:
+					cy -= r
+
+				self.create_vertical(blocks.SolidBlock('stone', strength = 38), rx, cy, rh)
+				rx += 1
+				i += 1
+
+		except IndexError:
+			pass
+
+	def drop_a_block(self, block, x = -1, start_y = 0):
 		fx = x
 		if x < 0:
 			fx = randint(0, self.get_width()-1)
 
 		try:
-			for y in range(self.get_height()):
+			for y in range(start_y, self.get_height()):
 				if not y == 0 and isinstance(self.the_map[fx][y], blocks.SolidBlock):
-					self.the_map[fx][y-1] = block
+					if not isinstance(self.the_map[fx][y-1], blocks.SolidBlock):
+						self.the_map[fx][y-1] = block
 					break
 		except IndexError:
 			print('Cannot drop a block outside the world.')
@@ -156,15 +199,18 @@ class ClassicThemedWorld(ThemedWorld):
 	def generate(self, w = 240, h = 180):
 		super(ClassicThemedWorld, self).generate(w, h)
 
-		self.gen_layer(blocks.SolidBlock('stone', 38))
-		self.gen_layer(blocks.SolidBlock('dirt'), scale = 7)
-		self.gen_layer(blocks.SolidBlock('dirtograss'), height = 65)
+		self.gen_ground(blocks.SolidBlock('stone', 38))
+		self.gen_ground(blocks.SolidBlock('dirt'), scale = 7)
+		self.gen_ground(blocks.SolidBlock('dirtograss'), height = 65)
+
+		for i in range(randint(0, 5)):
+			self.gen_mountain()
 
 		self.gen_ores(blocks.SolidBlock('dirt'), chance = 25)
 		self.gen_ores(blocks.SolidBlock('grafonium_crystal_type_a', strength = 100), height = 32)
 		self.gen_ores(blocks.SolidBlock('grafonium_crystal_type_b', strength = 100), height = 22, chance = 5)
 
-		self.gen_layer(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3, force = True)
+		self.gen_ground(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3, force = True)
 
 		for i in range(randint(5, 10)):
 			self.drop_a_block(blocks.gen_inventory_block(self.get_crate_theme()))
