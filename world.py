@@ -85,7 +85,7 @@ class ClassicThemedWorld(ThemedWorld):
 		try:
 			for c in self.the_map:
 				for y in range(len(c)-(h-cur_scale), len(c)):
-					if c[y] == None or force:
+					if not isinstance(c[y], blocks.SolidBlock) or force:
 						c[y] = copy.copy(block)
 				step_tick += 1
 				if step_tick >= step_len:
@@ -166,7 +166,7 @@ class ClassicThemedWorld(ThemedWorld):
 								cy -= 1
 
 							for zz in range(randint(2, 3)):
-								self.create_vertical(blocks.SolidBlock('stone', strength = 38), rx, cy, rh)
+								self.create_vertical(blocks.known_blocks['stone'], rx, cy, rh)
 								rx += 1
 
 				r = randint(1, 3)
@@ -175,14 +175,14 @@ class ClassicThemedWorld(ThemedWorld):
 				else:
 					cy -= r
 
-				self.create_vertical(blocks.SolidBlock('stone', strength = 38), rx, cy, rh)
+				self.create_vertical(blocks.known_blocks['stone'], rx, cy, rh)
 				rx += 1
 				i += 1
 
 		except IndexError:
 			pass
 
-	def drop_a_block(self, block, x = -1, start_y = 0):
+	def drop_a_block(self, block = None, x = -1, start_y = 0, rules = None):
 		fx = x
 		if x < 0:
 			fx = randint(0, self.get_width()-1)
@@ -191,26 +191,42 @@ class ClassicThemedWorld(ThemedWorld):
 			for y in range(start_y, self.get_height()):
 				if not y == 0 and isinstance(self.the_map[fx][y], blocks.SolidBlock):
 					if not isinstance(self.the_map[fx][y-1], blocks.SolidBlock):
-						self.the_map[fx][y-1] = block
+						if isinstance(rules, dict):
+							try:
+								b = rules[self.the_map[fx][y].name]
+								if isinstance(b, blocks.Block):
+									self.the_map[fx][y-1] = copy.copy(b)
+							except KeyError:
+								pass
+						elif isinstance(rules, blocks.BlockFilter):
+							self.the_map[fx][y-1] = copy.copy(rules.filter(self.the_map[fx][y], fx, y, self))
+						else:
+							if isinstance(block, blocks.Block):
+								self.the_map[fx][y-1] = copy.copy(block)
 					break
 		except IndexError:
 			print('Cannot drop a block outside the world.')
 
+	def gen_cover(self, rules, precent = 100):
+		for x in range(self.get_width()-1):
+			if randint(0, 100) < precent:
+				self.drop_a_block(x = x, rules = rules)
+
 	def generate(self, w = 240, h = 180):
 		super(ClassicThemedWorld, self).generate(w, h)
 
-		self.gen_ground(blocks.SolidBlock('stone', 38))
-		self.gen_ground(blocks.SolidBlock('dirt'), scale = 7)
-		self.gen_ground(blocks.SolidBlock('dirtograss'), height = 65)
+		self.gen_ground(blocks.known_blocks['stone'])
+		self.gen_ground(blocks.known_blocks['dirt'], scale = 7)
+		self.gen_ground(blocks.known_blocks['dirtograss'], height = 65)
 
 		for i in range(randint(0, 5)):
 			self.gen_mountain()
 
-		self.gen_ores(blocks.SolidBlock('dirt'), chance = 25)
+		self.gen_ores(blocks.known_blocks['dirt'], chance = 25)
 		self.gen_ores(blocks.SolidBlock('grafonium_crystal_type_a', strength = 100), height = 32)
 		self.gen_ores(blocks.SolidBlock('grafonium_crystal_type_b', strength = 100), height = 22, chance = 5)
 
-		self.gen_ground(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3, force = True)
+		self.gen_ground(blocks.UnbendableBlock('adminium'), height = 7, scale = 3, force = True)
 
 		for i in range(randint(5, 10)):
 			self.drop_a_block(blocks.gen_inventory_block(self.get_crate_theme()))

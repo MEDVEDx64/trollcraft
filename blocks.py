@@ -23,6 +23,10 @@ class SolidBlock(Block):
 		super(SolidBlock, self).__init__(name)
 		self.strength = strength
 
+class UnbendableBlock(SolidBlock):
+	def tick(self, x, y, world):
+		self.strength = 1000000000
+
 class LiquidBlock(Block):
 	def __init__(self, name = 'water'):
 		super(LiquidBlock, self).__init__(name)
@@ -59,17 +63,17 @@ class InventoryBlock(InteractiveBlock, SolidBlock, DictionaryBlock):
 		game.dialog.show(gui.InventoryFrame, [player, world, self.dict])
 
 global known_blocks
-known_blocks = [
-	SolidBlock('dirtograss'),
-	SolidBlock('stone', strength = 38),
-	SolidBlock('dirt'),
-	LiquidBlock('water'),
-	SolidBlock('bricks_gray', strength = 40),
-	SolidBlock('bricks_blue', strength = 40),
-	SolidBlock('bricks_yellow', strength = 40),
-	SolidBlock('bricks_red', strength = 40),
-	SolidBlock('grafonium_red', strength = 120)
-]
+known_blocks = {
+	'dirtograss':		SolidBlock('dirtograss'),
+	'stone':			SolidBlock('stone', strength = 38),
+	'dirt':				SolidBlock('dirt'),
+	'water':			LiquidBlock('water'),
+	'bricks_gray':		SolidBlock('bricks_gray', strength = 40),
+	'bricks_blue':		SolidBlock('bricks_blue', strength = 40),
+	'bricks_yellow':	SolidBlock('bricks_yellow', strength = 40),
+	'bricks_red':		SolidBlock('bricks_red', strength = 40),
+	'grafonium_red':	SolidBlock('grafonium_red', strength = 120)
+}
 
 from random import randint
 
@@ -88,7 +92,11 @@ def gen_inventory_block(theme = 'white'):
 			if flags[n]:
 				continue
 			flags[n] = True
-			b.dict['blocks'].append(known_blocks[n])
+			b.dict['blocks'].append(known_blocks[list(known_blocks.keys())[n]])
 			count -= 1
 
 	return b
+
+class BlockFilter(object):
+	def filter(self, block, x = 0, y = 0, world = None):
+		return None
