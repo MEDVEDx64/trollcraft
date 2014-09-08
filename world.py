@@ -61,6 +61,9 @@ class ThemedWorld(World):
 	def generate(self, w, h):
 		pass
 
+	def get_crate_theme(self):
+		return 'white'
+
 class ClassicThemedWorld(ThemedWorld):
 	def create_layers(self):
 		self.bg = layers.ComplexLayer(self, self.camera)
@@ -137,6 +140,19 @@ class ClassicThemedWorld(ThemedWorld):
 					except IndexError:
 						pass
 
+	def drop_a_block(self, block, x = -1):
+		fx = x
+		if x < 0:
+			fx = randint(0, self.get_width()-1)
+
+		try:
+			for y in range(self.get_height()):
+				if not y == 0 and isinstance(self.the_map[fx][y], blocks.SolidBlock):
+					self.the_map[fx][y-1] = block
+					break
+		except IndexError:
+			print('Cannot drop a block outside the world.')
+
 	def generate(self, w = 240, h = 180):
 		super(ClassicThemedWorld, self).generate(w, h)
 
@@ -150,15 +166,5 @@ class ClassicThemedWorld(ThemedWorld):
 
 		self.gen_layer(blocks.SolidBlock('adminium', 100500), height = 7, scale = 3, force = True)
 
-	def drop_a_block(self, block, x = -1):
-		fx = x
-		if x < 0:
-			fx = randint(0, self.get_width()-1)
-
-		try:
-			for y in range(self.get_height()):
-				if not y == 0 and isinstance(self.the_map[fx][y], blocks.SolidBlock):
-					self.the_map[fx][y-1] = block
-					break
-		except IndexError:
-			print('Cannot drop a block outside the world.')
+		for i in range(randint(5, 10)):
+			self.drop_a_block(blocks.gen_inventory_block(self.get_crate_theme()))

@@ -70,3 +70,25 @@ known_blocks = [
 	SolidBlock('bricks_red', strength = 40),
 	SolidBlock('grafonium_red', strength = 120)
 ]
+
+from random import randint
+
+def gen_inventory_block(theme = 'white'):
+	b = InventoryBlock('inventory_' + theme , strength = 250)
+	if randint(0, 20) > 18:
+		b.dict['blocks'] = copy.copy(known_blocks)
+	else:
+		b.dict['blocks'] = []
+		count = randint(2, len(known_blocks)/2)
+		if randint(0, 5) > 3:
+			count = randint(2, len(known_blocks)-len(known_blocks)/4*3)
+		flags = [False for i in known_blocks]
+		while count > 0:
+			n = randint(0, len(known_blocks)-1)
+			if flags[n]:
+				continue
+			flags[n] = True
+			b.dict['blocks'].append(known_blocks[n])
+			count -= 1
+
+	return b

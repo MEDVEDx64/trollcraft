@@ -44,12 +44,6 @@ class TrollGame:
 		global cursor
 		cursor = gui.CursorElement(font, self.cam)
 
-		crate = blocks.InventoryBlock('inventory_white', strength = 250)
-		crate.dict = {
-			'blocks': blocks.known_blocks
-		}
-		self.world.drop_a_block(crate, self.player.pos_x/world.GRID_SIZE+2)
-
 		self.gui_elements = []
 		self.gui_elements.append(gui.FPSElement(font, self.cam, [self.clock]))
 		self.gui_elements.append(cursor)

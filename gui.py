@@ -27,7 +27,7 @@ class FPSElement(Element):
 class SlotsElement(Element):
 	def draw(self):
 		display = pygame.display.get_surface()
-		start_x, start_y = 4, 4
+		start_x, start_y = 5, 5
 		pygame.gfxdraw.rectangle(display, (start_x-1, start_y-1, \
 			len(self.args[0].slots)*20+2, 22), (0, 0, 0, 255))
 
@@ -84,8 +84,8 @@ class InventoryFrame(Frame):
 	def draw(self):
 		d = pygame.display.get_surface()
 		pygame.gfxdraw.box(d, (0, 0, self.camera.screen_w, self.camera.screen_h), (50, 65, 144, 150))
-		t = self.font.render('Inventory', True, (255,255,255,255))
-		d.blit(t, (4, 4))
+		t = self.font.render('Inventory Block', True, (255,255,255,255))
+		d.blit(t, (self.camera.screen_w-t.get_width()-5, 4))
 
 		color = [25, 65, 144, 150]
 		x, y = 0, 1
@@ -115,9 +115,9 @@ class InventoryFrame(Frame):
 						break
 
 					try:
-						itemname = self.font.render('[' + self.items[str(self.curs_x) + '.' \
-							+ str(self.curs_y)].name + ']', True, (255, 224, 0, 255))
-						d.blit(itemname, (self.camera.screen_w - itemname.get_width() - 5, 4))
+						itemname = self.font.render(self.items[str(self.curs_x) + '.' \
+							+ str(self.curs_y)].name, True, (255, 224, 0, 255))
+						d.blit(itemname, (self.camera.screen_w - itemname.get_width() - 5, 21))
 					except KeyError:
 						pass
 
@@ -134,9 +134,16 @@ class InventoryFrame(Frame):
 				try:
 					b = self.items[str(self.curs_x) + '.' + str(self.curs_y)]
 					self.args[0].slots[self.args[0].highlighted_slot] = copy.copy(b)
-					self.active = False
+					#self.active = False
 				except (KeyError, TypeError):
 					pass
+
+			if e.type == KEYDOWN:
+				if e.key == K_1: self.args[0].on_slot_change(0)
+				if e.key == K_2: self.args[0].on_slot_change(1)
+				if e.key == K_3: self.args[0].on_slot_change(2)
+				if e.key == K_4: self.args[0].on_slot_change(3)
+				if e.key == K_5: self.args[0].on_slot_change(4)
 
 class DialogManager:
 	def __init__(self, font, camera):
