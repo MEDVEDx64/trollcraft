@@ -27,6 +27,8 @@ class TrollGame:
 		image.populate_image_db(image_repo, 'grafon/')
 		image.populate_image_db(image_repo, 'grafon/etc/')
 		self.blocks = image.ImageDB(self.cam)
+		image.populate_image_db(self.blocks, 'grafon/userblocks/')
+		blocks.populate_blocks(self.blocks)
 		image.populate_image_db(self.blocks, 'grafon/blocks/')
 		self.world = world.ClassicThemedWorld(self.cam, self.blocks)
 

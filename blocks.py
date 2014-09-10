@@ -77,6 +77,12 @@ known_blocks = {
 
 from random import randint
 
+def populate_blocks(idb):
+	kb = list(known_blocks.keys())
+	for i in list(idb.images.keys()):
+		if not i in kb:
+			known_blocks[i] = SolidBlock(i)
+
 def gen_inventory_block(theme = 'white'):
 	b = InventoryBlock('inventory_' + theme , strength = 250)
 	if randint(0, 20) > 18:
