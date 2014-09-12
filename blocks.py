@@ -62,7 +62,6 @@ class InventoryBlock(InteractiveBlock, SolidBlock, DictionaryBlock):
 	def on_click(self, player = None, world = None):
 		game.dialog.show(gui.InventoryFrame, [player, world, self.dict])
 
-global known_blocks
 known_blocks = {
 	'dirtograss':		SolidBlock('dirtograss'),
 	'stone':			SolidBlock('stone', strength = 38),

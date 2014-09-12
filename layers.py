@@ -134,3 +134,6 @@ class FXStack:
 		for layer in self.stack:
 			cs = layer.process(cs)
 		return cs
+
+final_fx = FXStack()
+single_fx = FXStack() # temporary stack, cleans up each tick

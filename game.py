@@ -51,8 +51,7 @@ class TrollGame:
 		self.gui_elements.append(cursor)
 		self.gui_elements.append(gui.SlotsElement(font, self.cam, [self.player, self.world]))
 
-		self.final_fx = layers.FXStack()
-		#self.final_fx.add_layer(layers.PixelateFX())
+		#layers.final_fx.add_layer(layers.PixelateFX())
 
 	def loop(self):
 		events = pygame.event.get()
@@ -60,6 +59,7 @@ class TrollGame:
 			if ev.type == QUIT:
 				self.shutdown()
 
+		del layers.single_fx.stack[:]
 		if dialog.frame.active:
 			dialog.frame.dispatch_events(events)
 		else:
@@ -91,8 +91,11 @@ class TrollGame:
 			dialog.frame.draw()
 
 		# Applying FX stack
-		# screen = pygame.display.get_surface()
-		# screen.blit(self.final_fx.process(screen), (0, 0))
+		screen = pygame.display.get_surface()
+		if len(layers.final_fx.stack) > 0:
+			screen.blit(layers.final_fx.process(screen), (0, 0))
+		if len(layers.single_fx.stack) > 0:
+			screen.blit(layers.single_fx.process(screen), (0, 0))
 		pygame.display.flip()
 
 	def shutdown(self):
