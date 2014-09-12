@@ -4,7 +4,7 @@ import time
 import world
 import pygame
 import pygame.gfxdraw
-import random
+from random import randint, Random
 
 class Layer(object):
 	def __init__(self, world, camera):
@@ -32,7 +32,7 @@ class ClassicBackground(Layer):
 		super(ClassicBackground, self).__init__(world, camera)
 		self.color = [150, 200, 220, 255]
 		self.day = False
-		self.skip = random.randint(0, 2000)
+		self.skip = randint(0, 2000)
 
 	def tick(self):
 		if self.skip > 0:
@@ -66,12 +66,12 @@ class ClassicBackground(Layer):
 		self.skip = 48
 
 	def draw_stars(self):
-		random.seed(100500)
+		rnd = Random(100500)
 		screen = pygame.display.get_surface()
 		for i in range(120):
-			x = random.randint(0, self.camera.screen_w)
-			y = random.randint(0, self.camera.screen_h)
-			size = random.randint(0, 1)
+			x = rnd.randint(0, self.camera.screen_w)
+			y = rnd.randint(0, self.camera.screen_h)
+			size = rnd.randint(0, 1)
 
 			alpha = (self.world.get_height()*world.GRID_SIZE+self.camera.offset_y-768)/4
 			if alpha > 255: alpha = 255
@@ -121,6 +121,41 @@ class PixelateFX(FXLayer):
 	def process(self, surface):
 		s = pygame.transform.scale(surface, (surface.get_width()/2, surface.get_height()/2))
 		return pygame.transform.scale(s, (surface.get_width(), surface.get_height()))
+
+class GlitchFX(FXLayer):
+	def process(self, surface):
+		px = pygame.PixelArray(surface)
+		step = 16
+		shift = [0, 0, 0]
+		dup = px[:][:]
+		skip = True
+		rnd = Random(round(time.time(), 1))
+
+		for i in range(surface.get_height()):
+			if i%step == 0:
+				if rnd.randint(0, 100) > 99:
+					skip = False
+				else:
+					skip = True
+
+				for s in range(len(shift)):
+					if rnd.randint(0, 8) > 4:
+						shift[s] = 0
+					else:
+						shift[s] = rnd.randint(1, 32)
+
+			if skip:
+				continue
+
+			for x in range(surface.get_width()):
+				try:
+					px[x][i] = (dup[x+shift[0]][i]&0xff0000) | (dup[x+shift[1]][i]&0xff00) | (dup[x+shift[2]][i]&0xff)
+				except IndexError:
+					pass
+
+		retval = px.make_surface()
+		del px
+		return retval
 
 class FXStack:
 	def __init__(self):

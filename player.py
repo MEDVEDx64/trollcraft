@@ -1,6 +1,7 @@
 import game
 import image
 import blocks
+import layers
 import copy
 from random import randint
 
@@ -281,7 +282,21 @@ class PhysicalPlayer(Player):
 	def on_crouch(self):
 		pass
 
-class BuilderPlayer(PhysicalPlayer, AnimatedPlayer):
+	def standing_on_block(self):
+		if self.is_on_surface():
+			try:
+				return self.world.the_map[(self.pos_x+self.width/2)/GRID_SIZE][(self.pos_y+self.height-1)/GRID_SIZE+1]
+			except IndexError: pass
+		return None
+
+class GenericPlayer(PhysicalPlayer, AnimatedPlayer):
+	def loop(self):
+		super(GenericPlayer, self).loop()
+		b = self.standing_on_block()
+		if isinstance(b, blocks.Block) and b.name == 'cocainum':
+			layers.single_fx.add_layer(layers.GlitchFX())
+
+class BuilderPlayer(GenericPlayer):
 	def __init__(self, camera, world):
 		super(BuilderPlayer, self).__init__(camera, world)
 		self.curs_x = 0 # screen-relative
