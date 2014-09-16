@@ -56,11 +56,15 @@ class Player(object):
 		else:
 			self.pos_x -= self.speed
 
+		return True
+
 	def on_jump(self):
 		self.pos_y -= self.speed
+		return True
 
 	def on_crouch(self):
 		self.pos_y += self.speed
+		return True
 
 	def on_sprint(self, entered = True):
 		if self.speed > 0:
@@ -69,6 +73,8 @@ class Player(object):
 				self.speed = 12
 			else:
 				self.speed = self.last_speed
+
+		return True
 
 class DrawablePlayer(Player):
 	def draw(self):
@@ -269,8 +275,15 @@ class PhysicalPlayer(Player):
 	def on_jump(self):
 		if self.is_on_surface():
 			self.fall_speed = -12
+		return True
 
 	def on_walk(self, right = True):
+		dest_x = self.pos_x
+		if right:
+			dest_x = dest_x + self.speed
+		else:
+			dest_x = dest_x - self.speed
+
 		self.walking = True
 		self.last_moved_right = right
 		
@@ -279,8 +292,12 @@ class PhysicalPlayer(Player):
 		else:
 			self.move('left', self.speed)
 
+		if self.pos_x == dest_x:
+			return True
+		return False
+
 	def on_crouch(self):
-		pass
+		return True
 
 	def standing_on_block(self):
 		if self.is_on_surface():
@@ -338,16 +355,16 @@ class BuilderPlayer(GenericPlayer):
 		if self.digging:
 			if isinstance(self.highlighted_block, blocks.SolidBlock):
 				if self.highlighted_block.strength == 0:
-					self.highlighted_block.on_destroyed()
-					self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
-						[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = None
+					if self.highlighted_block.on_destroyed():
+						self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
+							[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = None
 					return
 				self.highlighted_block.strength -= 1
 
 			elif isinstance(self.highlighted_block, blocks.Block):
-				self.highlighted_block.on_destroyed()
-				self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
-					[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = None
+				if self.highlighted_block.on_destroyed():
+					self.world.the_map[(self.curs_x-self.camera.offset_x)/GRID_SIZE] \
+						[(self.curs_y-self.camera.offset_y)/GRID_SIZE] = None
 				return
 
 		if self.placing:
@@ -372,6 +389,15 @@ class CreeperPlayer(BuilderPlayer):
 
 	def boom(self):
 		print('boom!')
+
+class BotPlayer(PhysicalPlayer, AnimatedPlayer):
+	def sync_camera(self):
+		pass
+
+class TestBotPlayer(BotPlayer):
+	def __init__(self, camera, world):
+		super(TestBotPlayer, self).__init__(camera, world)
+		self.initialize_animation(sprites_path = 'grafon/player/creeper/')
 
 import pygame
 from pygame.locals import *
@@ -421,6 +447,15 @@ class CreeperPlayerController(BuilderPlayerController):
 		super(CreeperPlayerController, self).dispatch_events(events)
 		if self.km.get_key_state(K_b) == KS_PRESSED:
 			self.player.boom()
+
+class TestBotPlayerController(PlayerController):
+	def __init__(self, player):
+		super(TestBotPlayerController, self).__init__(player)
+		self.right = True
+
+	def dispatch_events(self, events):
+		if not self.player.on_walk(self.right):
+			self.right = not self.right
 
 KS_UP = 0
 KS_PRESSED = 1

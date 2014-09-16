@@ -12,7 +12,7 @@ class Block(object):
 		pass
 
 	def on_destroyed(self):
-		pass
+		return True
 
 class InteractiveBlock(Block):
 	def on_click(self):
@@ -24,8 +24,8 @@ class SolidBlock(Block):
 		self.strength = strength
 
 class UnbendableBlock(SolidBlock):
-	def tick(self, x, y, world):
-		self.strength = 1000000000
+	def on_destroyed(self):
+		return False
 
 class LiquidBlock(Block):
 	def __init__(self, name = 'water'):

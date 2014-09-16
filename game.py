@@ -37,6 +37,12 @@ class TrollGame:
 		self.pc = player.CreeperPlayerController(self.player)
 		self.player.spawn()
 
+		self.bots = []
+		test_bot_player = player.TestBotPlayer(self.cam, self.world)
+		test_bot = {'player': test_bot_player, 'controller': player.TestBotPlayerController(test_bot_player)}
+		self.bots.append(test_bot)
+		self.bots[0]['player'].spawn()
+
 		self.clock = pygame.time.Clock()
 
 		pygame.font.init()
@@ -66,6 +72,10 @@ class TrollGame:
 			self.pc.dispatch_events(events)
 				
 		self.world.tick()
+		for i in self.bots:
+			i['controller'].dispatch_events(events)
+			i['player'].loop()
+
 		self.player.loop()
 
 	def cls(self):
@@ -78,6 +88,11 @@ class TrollGame:
 	def draw(self):
 		self.cls()
 		self.world.bg.draw()
+
+		for i in self.bots:
+			if isinstance(i['player'], player.DrawablePlayer):
+				i['player'].draw()			
+
 		if isinstance(self.player, player.DrawablePlayer):
 			self.player.draw()
 
