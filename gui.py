@@ -16,6 +16,16 @@ class Element(object):
 	def draw(self):
 		pass
 
+class MessageElement(Element):
+	def draw(self):
+		display = pygame.display.get_surface()
+		try:
+			s = self.font.render(self.args[0], True, self.args[2])
+			pygame.gfxdraw.box(display, (0, 0, self.camera.screen_w, self.camera.screen_h), self.args[1])
+			display.blit(s, (self.camera.screen_w/2-s.get_width()/2, self.camera.screen_h/2-s.get_height()/2))
+		except (TypeError, IndexError):
+			pass
+
 class FPSElement(Element):
 	def draw(self):
 		try:

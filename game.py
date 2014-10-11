@@ -31,6 +31,13 @@ class TrollGame:
 		blocks.populate_blocks(self.blocks)
 		image.populate_image_db(self.blocks, 'grafon/blocks/')
 		self.world = world.ClassicThemedWorld(self.cam, self.blocks)
+		try:
+			self.world.resource = sys.argv[1]
+			self.world.load()
+		except IndexError:
+			pass
+
+		self.saving_now = False
 
 		# Player
 		self.player = player.CreeperPlayer(self.cam, self.world)
@@ -46,6 +53,7 @@ class TrollGame:
 		self.clock = pygame.time.Clock()
 
 		pygame.font.init()
+		global font
 		font = pygame.font.Font(glob('ttf/*.ttf')[0], 16)
 		global dialog
 		dialog = gui.DialogManager(font, self.cam)
@@ -53,6 +61,7 @@ class TrollGame:
 		cursor = gui.CursorElement(font, self.cam)
 
 		self.gui_elements = []
+		self.single_gui_elements = []
 		self.gui_elements.append(gui.FPSElement(font, self.cam, [self.clock]))
 		self.gui_elements.append(cursor)
 		self.gui_elements.append(gui.SlotsElement(font, self.cam, [self.player, self.world]))
@@ -60,12 +69,25 @@ class TrollGame:
 		#layers.final_fx.add_layer(layers.PixelateFX())
 
 	def loop(self):
+		del layers.single_fx.stack[:]
+		del self.single_gui_elements[:]
+
+		if self.saving_now:
+			print('Saving world.')
+			self.world.save()
+			self.saving_now = False
+
 		events = pygame.event.get()
 		for ev in events:
 			if ev.type == QUIT:
 				self.shutdown()
+			# World saving
+			if ev.type == KEYDOWN:
+				if ev.key == K_o:
+					self.saving_now = True
+					self.single_gui_elements.append(gui.MessageElement(font, self.cam, \
+						['Saving...', (40, 0, 0, 120), (255, 255, 255, 255)]))
 
-		del layers.single_fx.stack[:]
 		if dialog.frame.active:
 			dialog.frame.dispatch_events(events)
 		else:
@@ -100,6 +122,8 @@ class TrollGame:
 		self.world.fg.draw()
 
 		for element in self.gui_elements:
+			element.draw()
+		for element in self.single_gui_elements:
 			element.draw()
 
 		if dialog.frame.active:

@@ -1,7 +1,9 @@
 from random import randint
+import jsonpickle
 import blocks
 import layers
 import copy
+import json
 
 GRID_SIZE = 32
 
@@ -53,6 +55,28 @@ class World(object):
 	def get_height(self):
 		return len(self.the_map[0])
 
+class LocalWorld(World):
+	def __init__(self, camera, image_db):
+		super(LocalWorld, self).__init__(camera, image_db)
+		self.resource = ""
+
+	def load(self):
+		try:
+			with open(self.resource) as f:
+				s = f.read()
+				self.the_map = jsonpickle.decode(s)
+				return True
+		except IOError:
+			return False
+
+	def save(self):
+		try:
+			with open(self.resource, "w") as f:
+				f.write(json.dumps(json.loads(jsonpickle.encode(self.the_map)), indent = 1))
+				return True
+		except IOError:
+			return False
+
 class ThemedWorld(World):
 	def initialize_map(self, w = 240, h = 180):
 		super(ThemedWorld, self).initialize_map(w, h)
@@ -64,7 +88,7 @@ class ThemedWorld(World):
 	def get_crate_theme(self):
 		return 'white'
 
-class ClassicThemedWorld(ThemedWorld):
+class ClassicThemedWorld(ThemedWorld, LocalWorld):
 	def create_layers(self):
 		self.bg = layers.ComplexLayer(self, self.camera)
 		self.bg.layers.append(layers.ClassicBackground(self, self.camera))
