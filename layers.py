@@ -119,7 +119,7 @@ class FXLayer(object):
 
 class PixelateFX(FXLayer):
 	def process(self, surface):
-		s = pygame.transform.scale(surface, (surface.get_width()/2, surface.get_height()/2))
+		s = pygame.transform.scale(surface, (surface.get_width()/8, surface.get_height()/8))
 		return pygame.transform.scale(s, (surface.get_width(), surface.get_height()))
 
 class GlitchFX(FXLayer):
